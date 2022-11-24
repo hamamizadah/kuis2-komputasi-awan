@@ -1,0 +1,62 @@
+version: '3.3'
+
+services:
+  #Mysql
+  db:
+    image: mysql:5.7.13
+    container_name: students-system-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    # ports: 
+    #   - "3306:3306"
+    networks:
+      - students-system-network
+    volumes:
+      - ./mysql/:/docker-entrypoint-initdb.d  # Initialize database with dump.sql file
+      - ./mysql/data:/var/lib/mysql           # Save to remote folder db updates
+
+  #Phpmyadmin     
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:4.8
+    container_name: students-system-phpmyadmin
+    ports:
+     - 8081:80    
+    networks:
+      - students-system-network
+    depends_on:
+      - db
+    links:
+       - db:db
+    restart: always
+    
+  #Web Service
+  web:
+    build: 
+      context: ./web/
+      dockerfile: Dockerfile
+    depends_on: 
+      - db
+    container_name: students-system-web-server
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - students-system-network
+    ports:
+      - 8080:80 
+    volumes:
+      - type: bind
+        source: ./web/src/
+        target: /var/www/html/
+    restart: always
+    links:
+      -  db
+
+# Networks - Volumes - etc.
+networks: 
+  students-system-network:    # Inner Network
