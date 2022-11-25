@@ -4,7 +4,7 @@ services:
   #Mysql
   db:
     image: mysql:5.7.13
-    container_name: students-system-mysql
+    container_name: kuis2-komputasi-awan-mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -13,7 +13,7 @@ services:
     # ports: 
     #   - "3306:3306"
     networks:
-      - students-system-network
+      - kuis2-komputasi-awan-network
     volumes:
       - ./mysql/:/docker-entrypoint-initdb.d  # Initialize database with dump.sql file
       - ./mysql/data:/var/lib/mysql           # Save to remote folder db updates
@@ -21,11 +21,11 @@ services:
   #Phpmyadmin     
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:4.8
-    container_name: students-system-phpmyadmin
+    container_name: kuis2-komputasi-awan-phpmyadmin
     ports:
      - 8081:80    
     networks:
-      - students-system-network
+      - kuis2-komputasi-awan-network
     depends_on:
       - db
     links:
@@ -39,14 +39,14 @@ services:
       dockerfile: Dockerfile
     depends_on: 
       - db
-    container_name: students-system-web-server
+    container_name: kuis2-komputasi-awan-web-server
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     networks:
-      - students-system-network
+      - kuis2-komputasi-awan-network
     ports:
       - 8080:80 
     volumes:
@@ -59,4 +59,4 @@ services:
 
 # Networks - Volumes - etc.
 networks: 
-  students-system-network:    # Inner Network
+  kuis2-komputasi-awan-network:    # Inner Network
